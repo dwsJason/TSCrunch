@@ -1,21 +1,28 @@
-TSCrunch V1.3
+TSCrunch V1.3.1
 
 by Antonio Savona
 
-April 2022
+March 2025
 
 
 About
 =====
 
 TSCrunch is an optimal, byte-aligned, LZ+RLE hybrid encoder, designed to maximize decoding speed on NMOS 6502 and derived CPUs, while keeping decent compression performance (for a bytecruncher, that is).
-TSCrunch was designed as the default asset cruncher for the upcoming game A Pig Quest, and, as such, it's optimized for in-memory level compression, but at as of version 1.0 it can also create SFX executables for off-line prg crunching.
+TSCrunch was designed as the default asset cruncher for the game A Pig Quest, and, as such, it's optimized for in-memory level compression, but as of version 1.0 it can also create SFX executables for off-line prg crunching.
 
 Requirements
 ============
 
-TSCrunch requires python 3.x with scipy library installed, or a windows x64 machine(A pre-compiled windows x64 command line executable is also provided). A GO version is also supplied to facilitate building on your OS of choice. 
-The memory decrunchers requires Kick Assembler, but it should be quite easy to port it to your assembler of choice.
+TSCrunch is written in GO and therefore should run on any machine that supports a go compiler.
+Precompiled binaries are available for the following platforms:
+- windows x64
+- windows arm64
+- linux x64
+- mac / darwin arm64
+
+A python version is also supplied as reference encoder, but use of GO version is recommended for speed. 
+The memory decrunchers requires Kick Assembler, but it should be quite easy to port them to your assembler of choice.
 
 Usage
 =====
@@ -37,6 +44,14 @@ Mem-crunches the file data.bin and generates a binary file crunched.bin
 
 	tscrunch -i data.prg crunched.prg
 Mem-crunches the file data.bin for in-place use, and generates a prg file crunched.prg with the appropriate load address
+
+	tscrunch -x2 49152 game.prg crunched.prg
+	
+Crunches the file game.prg and generates a self executable crunched.prg with alternative decrunching code, using $c000 (49152) as post-decrunch jmp address. The alternative decrunching code runs from stack instead of zero-page
+
+	tscrunch -x 0x1000 -b game.prg crunched.prg
+	
+Crunches the file game.prg and generates a self executable crunched.prg that blank the screen while decrunching, using $1000 (0x1000) as post-decrunch jmp address.
 
 
 Please refer to the inline help (tscrunch -h) for a detailed description of the different crunching options.
@@ -88,8 +103,8 @@ The following benchmark compares TSCrunch performance with those of a fast byte-
 
 Chopper Command - Raw encoding	 - game prg
 			
-				Tscrunch 1.3	TinyCrunch 1.2	B2
-Size			46913			46913			46913
+		Tscrunch 1.3		TinyCrunch 1.2		B2
+Size		46913			46913			46913
 Crunched size	12506			15419			11181
 % of original	26.66%			32.87%			23.83%
 Decrunch cycles	754733			1133039			1694585
@@ -98,6 +113,12 @@ Cycles per byte	16.08792872		24.15191951		36.12186388
 
 Changelog
 =========
+
+1.3.1
+-TSCrunch is now available on three platforms: Windows, Linux, and macOS.
+-Vastly improved crunching speed, with a reduced memory footprint for both the executable and the Python version.
+-Slightly improved compression for SFX files.
+-Slightly smaller decrunchers when using the INPLACE option.
 
 1.3
 -Improved compression adding near-optimal zero-runs and refactoring literals and lz2 tokens

@@ -107,6 +107,7 @@ tsdecrunch:
 			tya
 			tax
 			//carry is clear
+		updatezp:		
 			ldy #0
 	#else	//not inplace
 			tay
@@ -202,10 +203,12 @@ tsdecrunch:
 					
 			tya //y = a = 1. 
 			tax //y = a = x = 1. a + carry = 2
-			dey //ldy #0
-			
+	#if INPLACE
+			bne updatezp
+	#else
+			dey //ldy #0			
 			beq updatezp_noclc
-
+	#endif
 	//LZ
 	ts_delz:
 			
@@ -244,12 +247,16 @@ tsdecrunch:
 			bne ts_delz_loop 
 			
 			tya
-			
+	#if INPLACE
+			//update zero page with a = runlen, x = 2, y = 0
+			//clc not needed as we have len - 1 in A (from the encoder) and C = 1			
+			bcs updatezp
+	#else		
 			//update zero page with a = runlen, x = 2, y = 0
 			ldy #0
 			//clc not needed as we have len - 1 in A (from the encoder) and C = 1			
 			bcs updatezp_noclc
-
+	#endif
 		
 	optRun:	
 			ldy #255
